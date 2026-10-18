@@ -1,0 +1,255 @@
+/* Life Choices: styles
+   Home colours taken from the reference layout (meliketurgut.com): background #EAECE5, olive heading. */
+:root {
+  color-scheme: light;      /* one deliberate light look */
+  --bg: #EAECE5;
+  --ink: #1E1E1E;
+  --heading: #40400C;
+  --muted: #625D55;          /* darker than #7A746C so it passes WCAG AA on --bg */
+  --line: #D9D2C7;
+  --card: #FFFFFF;
+  --btn: #1E1E1E;
+  --btn-ink: #FFFFFF;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --ease-jelly: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+img { display: block; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 12px; }
+
+/* Screen-reader-only text */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Path background ---------- */
+#bg {
+  position: fixed; inset: 0; z-index: -1;
+  background-size: cover; background-position: center bottom; background-repeat: no-repeat;
+}
+/* Each path: the image on top, a matching gradient underneath as fallback if the file is missing. */
+#bg.path-rowling    { background-image: url("assets/backgrounds/rowling.png"),    linear-gradient(#A8B5A8, #D6D9D3); }
+#bg.path-kusama     { background-image: url("assets/backgrounds/kusama.png"),     linear-gradient(#D3A4A2, #ECD2CC); }
+#bg.path-frida      { background-image: url("assets/backgrounds/frida.png"),      linear-gradient(#D2AB80, #F0CBA7); }
+#bg.path-montessori { background-image: url("assets/backgrounds/montessori.png"), linear-gradient(#8D9EBE, #CAC4D4); }
+
+/* ---------- Shared ---------- */
+#app { min-height: 100vh; min-height: 100dvh; }
+.screen { animation: page-in .35s ease-out both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 14px 30px;
+  background: var(--btn); color: var(--btn-ink);
+  border: 0; border-radius: 999px;
+  font-size: 1rem; font-weight: 500; letter-spacing: .01em;
+  transition: transform .2s var(--ease-jelly), background-color .2s;
+}
+.btn.ghost { background: var(--card); color: var(--ink); border: 1px solid var(--ink); }
+.btn[disabled] { background: #D6D3CA; color: #4F4A43; cursor: default; }
+@media (hover: hover) {
+  .btn:not([disabled]):hover { animation: wobble-lift .6s ease-out; transform: translateY(-2px); }
+}
+.btn:not([disabled]):active { transform: scale(.97, 1.03); }
+
+/* ---------- Start screen ----------
+   Layout after the reference (meliketurgut.com): one line "Life [accessories] Choices"
+   filling the width in the middle; along the bottom, the network name (left, stronger)
+   and the disclaimer (right, quieter).
+   app.js fitTitle() sets the font size so the line fills the screen; every accessory is
+   10% taller than the tallest letters (--cap x --acc-scale), centred on the same line. */
+.home {
+  min-height: 100vh; min-height: 100dvh;
+  display: grid; grid-template-rows: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);   /* never let the title line widen the page */
+  padding-block: clamp(24px, 4vh, 44px);
+  padding-left: max(clamp(16px, 1.6vw, 40px), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(16px, 1.6vw, 40px), env(safe-area-inset-right, 0px));
+  background: var(--bg);
+}
+.title {
+  align-self: center;
+  width: 100%; min-width: 0;
+  --acc-scale: 1.1;                    /* accessories are 10% taller than the letters */
+  display: flex; align-items: center; justify-content: center; gap: .13em;
+  font-size: 9vw;                      /* first paint only; fitTitle() replaces it */
+  font-weight: 500; line-height: 1; letter-spacing: -.045em;
+  color: var(--heading);
+}
+.title .word { display: block; white-space: nowrap; }
+.bl { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
+.row { display: flex; align-items: center; gap: .13em; letter-spacing: 0; }
+
+.acc {
+  display: flex; align-items: center; justify-content: center;
+  height: calc(var(--cap, .74) * var(--acc-scale) * 1em);  /* 10% taller than the tallest letters */
+  padding: 0;
+  background: none; border: 0; border-radius: 12px;
+  font-size: inherit;
+  user-select: none; -webkit-user-select: none;
+}
+.acc img, .acc svg { height: 100%; width: auto; pointer-events: none; }
+.acc svg { width: calc(var(--cap, .74) * var(--acc-scale) * 1em); }
+@media (hover: hover) {
+  .acc:hover img, .acc:hover svg { animation: wobble .6s ease-out; }
+}
+.acc.picked img, .acc.picked svg { animation: spring .42s var(--ease-jelly) both; }
+
+/* One line along the bottom: network name left, short line right. Same size; the name is a touch stronger (semibold, full ink). */
+.home-foot {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+  font-size: .85rem; line-height: 1.4;
+}
+.home-foot p { margin: 0; }
+.home-foot .network { font-weight: 600; color: var(--ink); white-space: nowrap; }   /* only slightly stronger than the line on the right */
+.home-foot .disclaimer { font-weight: 400; color: var(--muted); text-align: right; }
+@media (max-width: 899px) {   /* not enough room for one line: stack, both left-aligned */
+  .home-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .home-foot .network { white-space: normal; }
+  .home-foot .disclaimer { text-align: left; }
+}
+
+/* Narrow screens: stack "Life" / accessories / "Choices", same size throughout */
+@media (max-width: 699px) {
+  .title { flex-direction: column; gap: .22em; }
+}
+
+/* ---------- Question / ending / reveal ---------- */
+.path {
+  max-width: 760px; margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+.card {
+  background: rgba(255,255,255,.92); border-radius: 16px; padding: 18px;
+}
+
+/* ---------- Question screen ----------
+   After the Buffer onboarding layout: slim top bar (back + progress dots),
+   then one centred column. Hierarchy, top to bottom:
+   Priority: scene + question (one paragraph, largest) first, then the answers, heads-up note last.
+   Order: progress -> scene paragraph ending in the question -> answers (cards); heads-up note in small type at the bottom centre.
+   Spacing scale: tight inside a group (label + its text), wider between groups. */
+.q-screen {
+  --gap-m: 32px;    /* scene paragraph -> answers */
+  --gap-l: 48px;    /* progress bar -> scene; answers -> heads-up note (minimum) */
+  max-width: none;
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+  padding-block: 20px 40px;
+}
+.q-top {
+  display: grid; grid-template-columns: 44px 1fr 44px; align-items: center;
+}
+.back {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.7); border: 0; color: var(--ink);
+  transition: background-color .2s;
+}
+.back:hover { background: #fff; }
+.dots { display: flex; justify-content: center; align-items: center; gap: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(30,30,30,.22); transition: width .35s ease-out, background-color .35s; }
+.dot.done { background: rgba(30,30,30,.55); }
+.dot.now { width: 22px; background: var(--ink); }
+
+.q-body {
+  flex: 1;
+  width: 100%; max-width: 920px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center;
+  padding-block: var(--gap-l) 0;      /* content starts a clear step below the progress bar */
+  text-align: center;
+}
+.heads {
+  margin: var(--gap-l) auto 0;        /* pushed to the bottom of the screen, centred */
+  max-width: 90ch; text-align: center; text-wrap: balance;
+  font-size: .78rem; line-height: 1.45;   /* quiet: small plain text, no box; full ink colour keeps it readable */
+}
+.scene {
+  margin: 0 0 var(--gap-m); max-width: 34em;   /* scene + question: the most important text, the largest type on the page */
+  font-size: clamp(1.3rem, 2.1vw, 1.65rem); font-weight: 500; line-height: 1.4; letter-spacing: -.012em;
+  text-wrap: pretty;
+}
+.question { font-weight: 700; }        /* same paragraph and size as the scene, set apart only by weight */
+
+.choices { width: 100%; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 12px; } /* equal width and height */
+.choice {
+  min-height: 120px; padding: 22px 24px;
+  background: var(--card); color: var(--ink);
+  border: 1px solid rgba(30,30,30,.12); border-radius: 14px;
+  text-align: left; font-size: 1.0625rem; line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(30,30,30,.06);
+  transition: transform .2s var(--ease-jelly), border-color .2s;
+}
+@media (hover: hover) {
+  .choice:hover { animation: wobble-lift .6s ease-out; transform: translateY(-2px); border-color: rgba(30,30,30,.35); }
+}
+.choice.press { animation: squash .12s ease-out both; }
+@media (max-width: 559px) {
+  .q-screen { --gap-m: 24px; --gap-l: 32px; }
+  .scene { font-size: 1.2rem; }
+  .choices { grid-template-columns: 1fr; }
+  .q-body { align-items: stretch; text-align: left; }   /* one left edge on phones; long scenes read better */
+}
+
+/* Ending + reveal */
+.ending { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; padding-bottom: 28px; }
+.ending .card { font-size: 1.15rem; padding: 28px; }
+.center { text-align: center; }
+.stack > * + * { margin-top: 14px; }
+.reveal h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.3rem); letter-spacing: -.02em; line-height: 1.15; }
+.reveal h2 { margin: 0 0 8px; font-size: 1.15rem; }
+.reveal p { margin: 6px 0 0; }
+.small-muted { font-size: .85rem; color: var(--muted); margin: 0; }
+.label { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 12px !important; }
+.reveal ul { margin: 6px 0 0; padding-left: 20px; }
+.reveal li + li { margin-top: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+
+@media (max-width: 559px) {
+  .path { padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+
+/* ---------- Jelly motion ---------- */
+@keyframes wobble {
+  0%   { transform: scale(1, 1); }
+  30%  { transform: scale(1.08, .94); }
+  55%  { transform: scale(.95, 1.06); }
+  80%  { transform: scale(1.03, .98); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes wobble-lift {
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(-2px) scale(1.03, .97); }
+  55%  { transform: translateY(-2px) scale(.98, 1.02); }
+  80%  { transform: translateY(-2px) scale(1.01, .99); }
+  100% { transform: translateY(-2px) scale(1, 1); }
+}
+@keyframes spring {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.08); }
+  70%  { transform: scale(.96); }
+  100% { transform: scale(1); }
+}
+@keyframes squash { to { transform: scale(.97, 1.03); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .btn:not([disabled]):hover, .choice:hover, .btn:active { transform: none !important; }
+}
