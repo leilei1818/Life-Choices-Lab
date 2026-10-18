@@ -1,8 +1,8 @@
 /* Life Choices: styles
-   Home colours taken from the reference layout (meliketurgut.com): background #EAECE5, olive heading. */
+   Home: pure white background, olive heading (layout after meliketurgut.com). */
 :root {
   color-scheme: light;      /* one deliberate light look */
-  --bg: #EAECE5;
+  --bg: #FFFFFF;
   --ink: #1E1E1E;
   --heading: #40400C;
   --muted: #625D55;          /* darker than #7A746C so it passes WCAG AA on --bg */
